@@ -1,9 +1,7 @@
 <template>
   <q-page class="flex flex-center">
-    <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-full.svg"
-    >
+    <router-link to='new'>Nueva partida</router-link>
+    <router-link to='join'>Unirse a Partida</router-link>
   </q-page>
 </template>
 

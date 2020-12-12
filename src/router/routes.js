@@ -7,6 +7,20 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') }
     ]
   },
+  {
+    path: '/join/:id?',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/game.vue') }
+    ]
+  },
+  {
+    path: '/new',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/game.vue') }
+    ]
+  },
 
   // Always leave this as last one,
   // but you can also remove it
