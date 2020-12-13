@@ -8,6 +8,14 @@ const routes = [
     ]
   },
   {
+    path: '/play/:id',
+    name: 'play',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/play.vue') }
+    ]
+  },
+  {
     path: '/join/:id?',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -19,6 +27,13 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/game.vue') }
+    ]
+  },
+  {
+    path: '/expired',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/expired.vue') }
     ]
   },
 

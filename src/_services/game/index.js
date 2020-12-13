@@ -1,5 +1,3 @@
-import config from '../config'
-import Firebase from 'firebase'
 
 const firebase = Firebase.initializeApp(config)
 const db = firebase.ref('/partidas')
