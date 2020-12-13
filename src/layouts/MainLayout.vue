@@ -1,107 +1,78 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="leftDrawerOpen = !leftDrawerOpen"
-        />
-
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-      content-class="bg-grey-1"
-    >
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          Essential Links
-        </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+  <div class="WAL position-relative" :style="style" style="background: #0F2027;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+">
+    <q-layout view="lHh Lpr lFf" class="WAL__layout shadow-3" container>
+      <q-page-container class="bg-grey-2">
+        <router-view />
+      </q-page-container>
+    </q-layout>
+  </div>
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
-
-const linksData = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
-
 export default {
-  name: 'MainLayout',
-  components: { EssentialLink },
+  name: 'WhatsappLayout',
+
   data () {
     return {
-      leftDrawerOpen: false,
-      essentialLinks: linksData
+      names: ['Tic Tac Toe', 'La Vieja', 'Tres en Raya', 'Ceros y Cruces', 'Triqui']
+    }
+  },
+
+  computed: {
+    currentConversation () {
+      return this.conversations[this.currentConversationIndex]
+    },
+
+    style () {
+      return {
+        height: this.$q.screen.height + 'px'
+      }
     }
   }
 }
 </script>
+
+<style lang="sass">
+.WAL
+  width: 100%
+  height: 100%
+  padding-top: 20px
+  padding-bottom: 20px
+
+  &__layout
+    margin: 0 auto
+    z-index: 4000
+    height: 100%
+    width: 90%
+    max-width: 950px
+    border-radius: 5px
+
+  &__field.q-field--outlined .q-field__control:before
+    border: none
+
+  .q-drawer--standard
+    .WAL__drawer-close
+      display: none
+
+@media (max-width: 850px)
+  .WAL
+    padding: 0
+    &__layout
+      width: 100%
+      border-radius: 0
+
+@media (min-width: 691px)
+  .WAL
+    &__drawer-open
+      display: none
+
+.conversation__summary
+  margin-top: 4px
+
+.conversation__more
+  margin-top: 0!important
+  font-size: 1.4rem
+</style>

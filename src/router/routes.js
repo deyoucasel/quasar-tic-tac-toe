@@ -9,7 +9,6 @@ const routes = [
   },
   {
     path: '/play/:id',
-    name: 'play',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/play.vue') }

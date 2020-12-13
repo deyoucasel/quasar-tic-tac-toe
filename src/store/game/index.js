@@ -1,4 +1,4 @@
-// import state from './state'
+
 const state = {
   playing: false
 }

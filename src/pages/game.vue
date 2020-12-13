@@ -1,9 +1,12 @@
 <template>
-  <q-page padding>
-    <template v-if="show">
-      inicializando partida {{playing}}
-    <session :id="gameId" :invited="invited"/>
-    </template>
+   <q-page padding>
+    <!-- content -->
+    <div class="q-col-gutter-md">
+      <br />
+      <template v-if="show">
+      <session :id="gameId" :invited="invited"/>
+      </template>
+    </div>
   </q-page>
 </template>
 
@@ -17,7 +20,7 @@ export default {
   },
   data () {
     return {
-      show: false,
+      show: true,
       gameId: this.$route.params.id,
       invited: false,
       user: null
@@ -31,14 +34,15 @@ export default {
       this.user = services.currentUser()
       console.log('currentUser', this.user)
       services.checkAvailability(this.$route.params.id).then((r) => {
-        console.log('resp', r)
+        console.log('status', r)
         // eslint-disable-next-line eqeqeq
         if (r.owner == true) {
           this.$router.push({ path: '/play/' + this.$route.params.id })
-        } else if (r.number === false) {
-          console.log('esta lleno')
-          this.$router.push({ path: '/expired' })
         // eslint-disable-next-line eqeqeq
+        } else if (r.number == true) {
+          console.log('esta lleno')
+          console.log('expired')
+          this.$router.push({ path: '/expired' })
         } else {
           this.show = true
         }

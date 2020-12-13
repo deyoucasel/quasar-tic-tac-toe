@@ -20,6 +20,43 @@ class ApiService {
     return firebase.auth().currentUser
   }
 
+  setTurno (idGame, idUser) {
+    return gamee.doc(idGame).update({
+      turno: idUser
+    })
+  }
+
+  setMove (idGame, newPosition, positions, user) {
+    positions = (positions != null) ? positions : []
+    positions.push(newPosition)
+    console.log('tested', idGame, newPosition)
+    console.log('posi', positions, user)
+    return gamee.doc(idGame).collection('players').doc(user).update({
+      positions
+    })
+  }
+
+  resetGame (idGame, idUser) {
+    return gamee.doc(idGame).update({
+      finished: false,
+      winner: null,
+      turno: idUser
+    })
+  }
+
+  resetPositions (idGame, idUser) {
+    return gamee.doc(idGame).collection('players').doc(idUser).update({
+      positions: []
+    })
+  }
+
+  setWinner (idGame, idWinner) {
+    return gamee.doc(idGame).update({
+      finished: true,
+      winner: idWinner
+    })
+  }
+
   createSession (name) {
     return firebase.auth().signInAnonymously()
       .then(async (resp) => {
@@ -64,8 +101,8 @@ class ApiService {
   }
 
   newGame (creator, player) {
-    console.log('creating game', creator)
     return gamee.add(creator).then((resp) => {
+      console.log('insertando colleccion')
       gamee.doc(resp.id).collection('players').doc(creator.author).set(player)
       const id = resp.id
       console.log('gamee', id)

@@ -1,5 +1,6 @@
 export default function () {
   return {
-    playing: false
+    playing: false,
+    user: null
   }
 }
