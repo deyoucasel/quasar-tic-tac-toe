@@ -4,7 +4,7 @@
     <div class="q-col-gutter-md">
       <br />
       <template v-if="show">
-      <session :id="gameId" :invited="invited"/>
+      <session :id="gameId"/>
       </template>
     </div>
   </q-page>
@@ -22,7 +22,6 @@ export default {
     return {
       show: true,
       gameId: this.$route.params.id,
-      invited: false,
       user: null
     }
   },

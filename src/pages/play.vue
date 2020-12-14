@@ -10,7 +10,6 @@
       >
         <q-card class="bg-teal text-white">
           <q-card-section>
-
             <div class="text-h6">El juego ha finalizado</div>
           </q-card-section>
 
@@ -24,7 +23,13 @@
               label="Reiniciar la Partida"
               @click="resetAll()"
             />
-            <q-btn v-close-popup flat color="primary" to="/" label="Ir al menu" />
+            <q-btn
+              v-close-popup
+              flat
+              color="primary"
+              to="/"
+              label="Ir al menu"
+            />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -35,42 +40,61 @@
           :key="player.id"
         >
           <div class="q-pa-md items-start q-gutter-md">
-            <q-card :class="(turno == player.uid) ? 'bg-positive text-white':''">
+            <q-card
+              :class="turno == player.uid ? 'bg-positive text-white' : ''"
+            >
               <q-card-section>
                 <div class="text-h6">{{ player.name }} {{(turno == player.uid) ? '(Tu turno)':''}}</div>
-                <div class="text-subtitle2">Jugador {{ player.player }} ({{(player.player == 1) ? 'X':'Y'}})</div>
+                <div class="text-subtitle2">Jugador {{ player.player }} ({{(player.player == 1) ? 'X':'O'}})</div>
               </q-card-section>
               <q-card-actions v-if="players && players.length < 2">
-                <q-btn flat icon="share" label="Compartir Link" @click="shareLink()"></q-btn>
-                <q-btn flat icon="content_copy" label="Copiar Link" @click="copyLink()"></q-btn>
+                <q-btn
+                  flat
+                  icon="share"
+                  label="Compartir Link"
+                  @click="shareLink()"
+                ></q-btn>
+                <q-btn
+                  flat
+                  icon="content_copy"
+                  label="Copiar Link"
+                  @click="copyLink()"
+                ></q-btn>
               </q-card-actions>
             </q-card>
           </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-5" v-if="players && players.length < 2">
-          <br>
+        <div
+          class="col-12 col-sm-6 col-md-5"
+          v-if="players && players.length < 2"
+        >
+          <br />
           <div class="text-h6">Ayuda</div>
-          <div class="text-subtitle2">Para jugar necestas enviar la invitacion a la sala a tus amigos, puedes copiar el link o enviarselo a tus amigos con el boton compartir</div>
+          <div class="text-subtitle2">
+            Para jugar necestas enviar la invitacion a la sala a tus amigos,
+            puedes copiar el link o enviarselo a tus amigos con el boton
+            compartir
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="col col-xs-1"></div>
         <div class="col-6 col-xs-12">
-            <div class="row">
-                       <div
-            class="col-4"
-            v-for="(square, idx) in square.data"
-            :key="square.id"
-            @click="setMove(square.player, idx)"
-          >
-            <div :class="'square ' + square.class">
-              <template v-if="square.player == 1"> X </template>
-              <template v-else-if="square.player == 2"> O </template>
+          <div class="row">
+            <div
+              class="col-4"
+              v-for="(square, idx) in square.data"
+              :key="square.id"
+              @click="setMove(square.player, idx)"
+            >
+              <div :class="'square ' + square.class">
+                <template v-if="square.player == 1"> X </template>
+                <template v-else-if="square.player == 2"> O </template>
+              </div>
             </div>
           </div>
-            </div>
         </div>
-        <div class="col  col-xs-1"></div>
+        <div class="col col-xs-1"></div>
       </div>
     </div>
   </q-page>
@@ -82,6 +106,9 @@ import { copyToClipboard } from 'quasar'
 import { mapMutations, mapState, mapActions, mapGetters } from 'vuex'
 export default {
   created () {
+    /**
+     *consulta de Firebase para hacer sincronizacion en tiempo real mediante el metodo onSnapchot de firestore de las partidas
+     **/
     this.getStatusUser()
     this.db
       .collection('partidas')
@@ -93,6 +120,9 @@ export default {
         this.turno = this.partida.turno
         this.owner = this.partida.author
       })
+    /**
+     *consulta de Firebase para hacer sincronizacion en tiempo real mediante el metodo onSnapchot de firestore de los jugadores
+     **/
     this.db
       .collection('partidas')
       .doc(this.$route.params.id)
@@ -109,6 +139,18 @@ export default {
   },
   name: 'Play',
   props: ['id'],
+  /**
+   * @param {Object} square Contiene el numero de campos que componen el tictactoe y un objeto data donde se va a volcar la informacion de base de datos con los distintos estados del mismo .
+   * @param {Class} db Contiene la inicializacion de Firebase para comunicarse con Cloud Firestore
+   * @param {Object} partida Variable para almacenar los fatos de la partida (traidos desde Firebase)
+   * @param {String} owner Variable para asignar el estado del creador de la sala
+   * @param {Boolean} finished Almacena el estado de una partida si se queda sin campos o resulta un ganador
+   * @param {Object} players Contiene la lista de los jugadores de la partida
+   * @param {Number} counter Variable para calcular si no quedan mas movimientos para finalizar la partida
+   * @param {Class} turno Contiene el user id de jugador que le toca hacer su movimiento
+   * @param {Class} pattenToWin Contiene la lista de combinaciones estandar para poder ganar una partida de TicTac Toe
+   */
+
   data () {
     return {
       square: { slot: 9, data: null },
@@ -131,26 +173,44 @@ export default {
       ]
     }
   },
+
   computed: {
     ...mapState('game', ['user'])
   },
   methods: {
+    /**
+     * Helpers de Vuex para manipular el store de forma mas integrada y directa
+     **/
     ...mapGetters('game', ['getUser']),
     ...mapActions('game', ['getStatusUser']),
     ...mapMutations('game', ['setUser']),
+    /**
+     * Asigna al portapapeles el link de la partida creada para enviar a cualquier contacto
+     **/
     copyLink () {
-      copyToClipboard('http://' + window.location.host + '/#/join/' + this.$route.params.id)
+      copyToClipboard(
+        'http://' + window.location.host + '/#/join/' + this.$route.params.id
+      )
+      alert('Enlace copiado')
     },
+    /**
+     * Permite asignar un enlace para compartir via android o ios para compartir desde el metodo Navigator.share()
+     **/
     shareLink () {
       if (navigator.share) {
-        navigator.share({
-          url: window.location.host + '/#/join/' + this.$route.params.id,
-          text: 'ID manual para ingresar ' + this.$route.params.id,
-          title: 'Invitacion para jugar Tic Tac Toe'
-        }).then(() => console.log('Successful share'))
-          .catch(error => console.log('Error sharing:', error))
+        navigator
+          .share({
+            url: window.location.host + '/#/join/' + this.$route.params.id,
+            text: 'ID manual para ingresar ' + this.$route.params.id,
+            title: 'Invitacion para jugar Tic Tac Toe'
+          })
+          .then(() => console.log('Successful share'))
+          .catch((error) => console.log('Error sharing:', error))
       }
     },
+    /**
+     * Permite reiniciar la partida con los mismos jugadores sin crear una nueva
+     **/
     resetAll () {
       let userId = null
       for (const player of this.players) {
@@ -159,6 +219,9 @@ export default {
       }
       services.resetGame(this.$route.params.id, userId)
     },
+    /**
+     * Calcula las posiciones traidas de base de datos para generar los estados de cada campo del tablero
+     **/
     generateSquare () {
       this.counter = 0
       // eslint-disable-next-line eqeqeq
@@ -172,7 +235,10 @@ export default {
           }
           if (this.players[0].positions.includes(i)) {
             item.player = this.players[0].player
-          } else if (this.players.length > 1 && this.players[1].positions.includes(i)) {
+          } else if (
+            this.players.length > 1 &&
+            this.players[1].positions.includes(i)
+          ) {
             item.player = this.players[1].player
           } else {
             this.counter++
@@ -180,6 +246,7 @@ export default {
           list.push(item)
         }
         this.square.data = list
+        /* Verificamos si el contador llega a cero para saber si la partida finalizo sin ningun ganador */
         // eslint-disable-next-line eqeqeq
         if (this.counter < 1) {
           console.log(this.counter)
@@ -187,9 +254,18 @@ export default {
         }
       }
     },
+    /**
+     * Establecer el movimiento del jugador y las condiciones para ejecutarlos
+     **/
     setMove (player, idx) {
       // eslint-disable-next-line eqeqeq
-      if (player == null && this.players && this.players.length == 2 && !this.partida.finished) {
+      if (
+        player == null &&
+        this.players &&
+        // eslint-disable-next-line eqeqeq
+        this.players.length == 2 &&
+        !this.partida.finished
+      ) {
         const user = this.getUser()
         console.log(this.partida.turno, user.uid)
         // eslint-disable-next-line eqeqeq
@@ -199,7 +275,7 @@ export default {
             // eslint-disable-next-line eqeqeq
             if (player.uid == user.uid) {
               positions = player.positions
-            // eslint-disable-next-line eqeqeq
+              // eslint-disable-next-line eqeqeq
             } else {
               this.turno = player.uid
             }
@@ -214,9 +290,13 @@ export default {
         alert('Espera que un usuario ingrese a la sala')
       }
     },
+    /**
+     * Determinar si existe ganador al finalizar el movimiento
+     **/
     findWinner () {
       this.players.forEach((play) => {
         this.pattenToWin.forEach((item) => {
+          // Comparar la fila de combinaciones ganadoras con las del jugador para determinar si ha ganado
           if (this.compare(item, play.positions)) {
             console.log('square.data', this.square)
             for (var i = 0; i < item.length; i++) {
@@ -227,6 +307,9 @@ export default {
         })
       })
     },
+    /**
+     * Compara un arreglo con otro para determinar si todos los indices existen en el otro arreglo
+     **/
     compare (source, compare) {
       const containsAll = (needles, haystack) =>
         needles.every(Set.prototype.has, new Set(haystack))

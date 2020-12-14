@@ -8,6 +8,11 @@ background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+
         <router-view />
       </q-page-container>
     </q-layout>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
   </div>
 </template>
 
@@ -34,8 +39,8 @@ export default {
   }
 }
 </script>
-
 <style lang="sass">
+
 .WAL
   width: 100%
   height: 100%
